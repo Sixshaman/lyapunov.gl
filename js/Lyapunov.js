@@ -8,6 +8,7 @@ function main()
     const radioButtonFire    = document.querySelector("#RadioThemeFire");
     const radioButtonElectro = document.querySelector("#RadioThemeElectro");
     const radioButtonClassic = document.querySelector("#RadioThemeClassic");
+    const radioButtonSepia   = document.querySelector("#RadioThemeSepia");
 
     const gl             = canvas.getContext("webgl2");
     const extFloatTex    = gl.getExtension("EXT_color_buffer_float");
@@ -100,25 +101,36 @@ function main()
 
     radioButtonFire.onclick = function()
     {
-        colorMultiply = [1.0,  1.0,  1.0,  1.0];
-        colorAdd      = [0.0, -1.0, -2.0,  0.0];
-        colorAbsMix   = [1.0,  1.0,  1.0,  1.0];
+        colorMultiplyNeg = [-1.0, -1.0, -1.0,  1.0];
+        colorAddNeg      = [ 0.0, -1.0, -2.0,  0.0];
+        colorMultiplyPos = [ 1.0,  1.0,  1.0,  1.0];
+        colorAddPos      = [ 0.0, -1.0, -2.0,  0.0];
     }
 
     radioButtonElectro.onclick = function()
     {
-        colorMultiply = [0.5,  0.1,  1.0,  1.0];
-        colorAdd      = [0.0,  0.0,  0.0,  0.0];
-        colorAbsMix   = [1.0,  1.0,  1.0,  1.0];
+        colorMultiplyNeg = [-0.5, -0.1, -1.0,  1.0];
+        colorAddNeg      = [ 0.0,  0.0,  0.0,  0.0];
+        colorMultiplyPos = [ 0.5,  0.1,  1.0,  1.0];
+        colorAddPos      = [ 0.0,  0.0,  0.0,  0.0];
     }
 
     radioButtonClassic.onclick = function()
     {
-        colorMultiply = [ 0.22,  0.18,  0.70,  1.0];
-        colorAdd      = [ 0.74,  0.58,  0.41,  0.0];
-        colorAbsMix   = [ 0.14,  0.14,  0.10,  0.0];
+        colorMultiplyNeg = [ 0.25,  0.25,  0.00,  1.00];
+        colorAddNeg      = [ 1.00,  1.00,  0.00,  0.00];
+        colorMultiplyPos = [ 0.00,  0.00,  2.00,  1.00];
+        colorAddPos      = [ 0.00,  0.00,  0.00,  0.00];
     }
     
+    radioButtonSepia.onclick = function()
+    {
+        colorMultiplyNeg = [ 0.22,  0.18,  0.70, 1.0];
+        colorAddNeg      = [ 0.74,  0.58,  0.41, 0.0];
+        colorMultiplyPos = [ 0.22,  0.18,  0.70, 1.0];
+        colorAddPos      = [ 0.28,  0.26,  0.25, 0.0];
+    }
+
     var seqStr   = seqTextArea.value;
     var seqIndex = 0;
 
@@ -127,9 +139,10 @@ function main()
     var spaceScale     = [2.0,  2.0]; //[-1, 1] -> [-2, 2]
     var spaceTranslate = [2.0,  2.0]; //[-2, 2] -> [ 0, 4]; 
 
-    var colorMultiply = [1.0,  1.0,  1.0,  1.0];
-    var colorAdd      = [0.0, -1.0, -2.0,  0.0];
-    var colorAbsMix   = [1.0,  1.0,  1.0,  1.0];
+    var colorMultiplyNeg = [-1.0, -1.0, -1.0,  1.0];
+    var colorAddNeg      = [ 0.0, -1.0, -2.0,  0.0];
+    var colorMultiplyPos = [ 1.0,  1.0,  1.0,  1.0];
+    var colorAddPos      = [ 0.0, -1.0, -2.0,  0.0];
 
     const standardWidth  = canvas.clientWidth;
     const standardHeight = canvas.clientHeight;
@@ -155,9 +168,10 @@ function main()
     var lyapunovScaleSpaceUniformLocation     = null;
     var lyapunovTranslateSpaceUniformLocation = null;
 
-    var colorMultiplyUniformLocation = null;
-    var colorAddUniformLocation      = null;
-    var colorAbsMixUniformLocation   = null;
+    var colorMultiplyNegUniformLocation = null;
+    var colorAddNegUniformLocation      = null;
+    var colorMultiplyPosUniformLocation = null;
+    var colorAddPosUniformLocation      = null;
 
     var relativeTranslateUniformLocation = null;
 
@@ -302,9 +316,10 @@ function main()
 	
         uniform highp sampler2D gLambdaTex;
         
-        uniform lowp vec4 gColorMultiply;
-        uniform lowp vec4 gColorAdd;
-        uniform lowp vec4 gColorAbsMix;
+        uniform lowp vec4 gColorMultiplyNeg;
+        uniform lowp vec4 gColorAddNeg;
+        uniform lowp vec4 gColorMultiplyPos;
+        uniform lowp vec4 gColorAddPos;
         
         in mediump vec2 vTexCoord;
         
@@ -313,14 +328,17 @@ function main()
         void main(void)
         {
             highp float lambda = texture(gLambdaTex, vTexCoord).x;
-        
-            //To choose between abs(lambda) and lambda as color source
+            lambda = clamp(lambda, -1000000.0f, 1000000.0f);
+
             highp vec4 baseColor = vec4(lambda, lambda, lambda, 1.0f);
-            highp vec4 absColor  = abs(baseColor);
-            
-            lowp vec4 mixColor = mix(baseColor, absColor, gColorAbsMix);
-            
-            colorMain = mixColor * gColorMultiply + gColorAdd;
+            if(lambda < 0.0f)
+            {
+                colorMain = baseColor * gColorMultiplyNeg + gColorAddNeg;
+            }
+            else
+            {
+                colorMain = baseColor * gColorMultiplyPos + gColorAddPos;
+            }           
         }`;
 
         const vsResetSource = 
@@ -541,9 +559,10 @@ function main()
         lyapunovScaleSpaceUniformLocation     = gl.getUniformLocation(lyapunovShaderProgram, "gScale");
         lyapunovTranslateSpaceUniformLocation = gl.getUniformLocation(lyapunovShaderProgram, "gTranslate");
 
-        colorMultiplyUniformLocation = gl.getUniformLocation(finalShaderProgram, "gColorMultiply");
-        colorAddUniformLocation      = gl.getUniformLocation(finalShaderProgram, "gColorAdd");
-        colorAbsMixUniformLocation   = gl.getUniformLocation(finalShaderProgram, "gColorAbsMix");
+        colorMultiplyNegUniformLocation = gl.getUniformLocation(finalShaderProgram, "gColorMultiplyNeg");
+        colorAddNegUniformLocation      = gl.getUniformLocation(finalShaderProgram, "gColorAddNeg");
+        colorMultiplyPosUniformLocation = gl.getUniformLocation(finalShaderProgram, "gColorMultiplyPos");
+        colorAddPosUniformLocation      = gl.getUniformLocation(finalShaderProgram, "gColorAddPos");
 
         relativeTranslateUniformLocation = gl.getUniformLocation(staticShaderProgram, "gRelativeTranslate");
     }
@@ -725,9 +744,10 @@ function main()
 
         gl.uniform1i(finalLambdaTextureLocation, 0);
 
-        gl.uniform4fv(colorMultiplyUniformLocation, colorMultiply);
-        gl.uniform4fv(colorAddUniformLocation,      colorAdd);
-        gl.uniform4fv(colorAbsMixUniformLocation,   colorAbsMix);
+        gl.uniform4fv(colorMultiplyNegUniformLocation, colorMultiplyNeg);
+        gl.uniform4fv(colorAddNegUniformLocation,      colorAddNeg);
+        gl.uniform4fv(colorMultiplyPosUniformLocation, colorMultiplyPos);
+        gl.uniform4fv(colorAddPosUniformLocation,      colorAddPos);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, lambdaTex1);
