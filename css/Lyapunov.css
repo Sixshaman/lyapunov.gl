@@ -1,0 +1,56 @@
+body
+{
+    background-color: black;
+}
+
+div.container
+{
+    display: flex;
+}
+
+div.leftside
+{
+    width: fit-content;
+    float: left;
+}
+
+div.rightside
+{
+    float: right;
+    margin-left: 20px;
+    display: flex;
+    width: 100%;
+}
+
+div.radiobuttons
+{
+    display: inline-block;
+    width: 10%;
+}
+
+div.radiobuttons input
+{
+    width: 100%;
+}
+
+textarea
+{
+    background-color: black;
+    border-color: yellow;
+    color: yellow;
+    resize: none;
+    border-radius: 10px;
+
+    float: left;
+
+    width: 90%;
+    height: auto;
+
+    font-family: Arial Rounded MT Bold, Helvetica Rounded, Arial, sans-serif;
+    font-size: 48px;
+}
+
+p
+{
+    color: yellow;
+}
