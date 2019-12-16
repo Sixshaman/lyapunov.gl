@@ -391,14 +391,14 @@ function main()
             highp float xn      = texture(gPrevX,      vTexCoord).r;
             highp float lambdan = texture(gPrevLambda, vTexCoord).r;
         
-            highp float prevCoeff = float(gIndex - 1u) / float(gIndex);
-            highp float thisCoeff = 1.0f               / float(gIndex);
-        
+            highp float prevCoeff = float(gIndex - 1u);
+            highp float thisCoeff = 1.0f / float(gIndex);
+
             highp float phase = abs(rn * (1.0f - 2.0f * xn)); 
             phase             = max(phase, 1.0e-36); //To counter log(0) case (if you disable this, you'll see white pixels everywhere)
 
-            oNextX      = rn * xn * (1.0f - xn);
-            oNextLambda = prevCoeff * lambdan + thisCoeff * log(phase);
+            oNextX = rn * xn * (1.0f - xn);
+            oNextLambda = (prevCoeff * lambdan + log(phase)) * thisCoeff;
         }`;
 
         const vsFinalSource = 
@@ -759,7 +759,7 @@ function main()
 
     function resetValues()
     {
-        seqIndex   = 0;
+        seqIndex = 0;
 
         gl.viewport(0, 0, textureWidth, textureHeight);
         gl.bindVertexArray(resetVertexBuffer);
@@ -782,6 +782,7 @@ function main()
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, null, 0);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
+        seqIndex += 1;
         swapBuffers();
     }
 
