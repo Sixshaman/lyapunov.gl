@@ -3,11 +3,13 @@
 <head>
     <meta charset="utf-8"/>
     <title>Lyapunov Fractal</title>
-    <script src="js/Lyapunov.js?ver=1.3"></script>
-    <link rel="stylesheet" type="text/css" href="css/Lyapunov.css?ver=1.3"> 
+    <script src="js/Lyapunov.js?ver=1.3.1"></script>
+    <link rel="stylesheet" type="text/css" href="css/Lyapunov.css?ver=1.3.1"> 
 </head>
 
 <body>
+    <img id="canvasSaveImg"></img>
+
     <div class="container">
         <div class="canvascontainer">
             <canvas id="LyapunovCanvas" width="900" height="900"></canvas>
@@ -28,52 +30,12 @@
                         <p id="domain" class="domainval">[&nbsp0.00,&nbsp4.00] x [&nbsp0.00,&nbsp4.00]</p>
                     </div>
                 </div>
-
-                <div class="themeExecutiveControl">
-                    <div class="colorControlSlider">
-                        <p class="pr">RED negative multiplier:</p><input type="range" min="0" max="200" value="100" class="slider" id="redNM"></input><p class="pr" id="redNMText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pg">GRN negative multiplier:</p><input type="range" min="0" max="200" value="100" class="slider" id="grnNM"></input><p class="pg" id="grnNMText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pb">BLU negative multiplier:</p><input type="range" min="0" max="200" value="100" class="slider" id="bluNM"></input><p class="pb" id="bluNMText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pr">RED negative additionee:</p><input type="range" min="0" max="200" value="100" class="slider" id="redNA"></input><p class="pr" id="redNAText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pg">GRN negative additionee:</p><input type="range" min="0" max="200" value="100" class="slider" id="grnNA"></input><p class="pg" id="grnNAText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pb">BLU negative additionee:</p><input type="range" min="0" max="200" value="100" class="slider" id="bluNA"></input><p class="pb" id="bluNAText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pr">RED positive multiplier:</p><input type="range" min="0" max="200" value="100" class="slider" id="redPM"></input><p class="pr" id="redPMText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pg">GRN positive multiplier:</p><input type="range" min="0" max="200" value="100" class="slider" id="grnPM"></input><p class="pg" id="grnPMText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pb">BLU positive multiplier:</p><input type="range" min="0" max="200" value="100" class="slider" id="bluPM"></input><p class="pb" id="bluPMText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pr">RED positive additionee:</p><input type="range" min="0" max="200" value="100" class="slider" id="redPA"></input><p class="pr" id="redPAText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pg">GRN positive additionee:</p><input type="range" min="0" max="200" value="100" class="slider" id="grnPA"></input><p class="pg" id="grnPAText">0.5</p>
-                    </div>
-                    <div class="colorControlSlider">
-                        <p class="pb">BLU positive additionee:</p><input type="range" min="0" max="200" value="100" class="slider" id="bluPA"></input><p class="pb" id="bluPAText">0.5</p>
-                    </div>
-                </div>
-            </div>
-            <div class="themebuttons">
-                    <input type="radio" name="theme" value="Fire"    id="RadioThemeFire"    checked></input>
-                    <input type="radio" name="theme" value="Electro" id="RadioThemeElectro"        ></input>
-                    <input type="radio" name="theme" value="Classic" id="RadioThemeClassic"        ></input>
-                    <input type="radio" name="theme" value="Classic" id="RadioThemeSepia"          ></input>
-            </div>
+        </div>
+        <div class="themebuttons">
+                <input type="radio" name="theme" value="Fire"    id="RadioThemeFire"    checked></input>
+                <input type="radio" name="theme" value="Electro" id="RadioThemeElectro"        ></input>
+                <input type="radio" name="theme" value="Classic" id="RadioThemeClassic"        ></input>
+                <input type="radio" name="theme" value="Classic" id="RadioThemeSepia"          ></input>
         </div>
     </div>
 </body>

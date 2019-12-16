@@ -23,103 +23,6 @@ function main()
         alert("Unable to initialize WebGL. Your browser or machine may not support it.");
         return;
     }
-
-    var redNMSlider = document.querySelector("#redNM");
-    var grnNMSlider = document.querySelector("#grnNM"); 
-    var bluNMSlider = document.querySelector("#bluNM"); 
-    var redNASlider = document.querySelector("#redNA"); 
-    var grnNASlider = document.querySelector("#grnNA"); 
-    var bluNASlider = document.querySelector("#bluNA"); 
-    var redPMSlider = document.querySelector("#redPM");
-    var grnPMSlider = document.querySelector("#grnPM"); 
-    var bluPMSlider = document.querySelector("#bluPM");
-    var redPASlider = document.querySelector("#redPA"); 
-    var grnPASlider = document.querySelector("#grnPA"); 
-    var bluPASlider = document.querySelector("#bluPA"); 
-
-    redPMSlider.addEventListener('input', function () 
-    {
-        var sliderVal = redPMSlider.value / 50.0 - 2.0;
-        document.querySelector("#redPMText").textContent = sliderVal;
-        colorMultiplyPos[0] = sliderVal;
-    }, false);
-
-    grnPMSlider.addEventListener('input', function () 
-    {
-        var sliderVal = grnPMSlider.value / 50.0 - 2.0;
-        document.querySelector("#grnPMText").textContent = sliderVal;
-        colorMultiplyPos[1] = sliderVal;
-    }, false);
-
-    bluPMSlider.addEventListener('input', function () 
-    {
-        var sliderVal = bluPMSlider.value / 50.0 - 2.0;
-        document.querySelector("#bluPMText").textContent = sliderVal;
-        colorMultiplyPos[2] = sliderVal;
-    }, false);
-
-    redPASlider.addEventListener('input', function () 
-    {
-        var sliderVal = redPASlider.value / 50.0 - 2.0;
-        document.querySelector("#redPAText").textContent = sliderVal;
-        colorAddPos[0] = sliderVal;
-    }, false);
-
-    grnPASlider.addEventListener('input', function () 
-    {
-        var sliderVal = grnPASlider.value / 50.0 - 2.0;
-        document.querySelector("#grnPAText").textContent = sliderVal;
-        colorAddPos[1] = sliderVal;
-    }, false);
-
-    bluPASlider.addEventListener('input', function () 
-    {
-        var sliderVal = bluPASlider.value / 50.0 - 2.0;
-        document.querySelector("#bluPAText").textContent = sliderVal;
-        colorAddPos[2] = sliderVal;
-    }, false);
-    
-    redNMSlider.addEventListener('input', function () 
-    {
-        var sliderVal = redNMSlider.value / 50.0 - 2.0;
-        document.querySelector("#redNMText").textContent = sliderVal;
-        colorMultiplyNeg[0] = sliderVal;
-    }, false);
-
-    grnNMSlider.addEventListener('input', function () 
-    {
-        var sliderVal = grnNMSlider.value / 50.0 - 2.0;
-        document.querySelector("#grnNMText").textContent = sliderVal;
-        colorMultiplyNeg[1] = sliderVal;
-    }, false);
-
-    bluNMSlider.addEventListener('input', function () 
-    {
-        var sliderVal = bluNMSlider.value / 50.0 - 2.0;
-        document.querySelector("#bluNMText").textContent = sliderVal;
-        colorMultiplyNeg[2] = sliderVal;
-    }, false);
-
-    redNASlider.addEventListener('input', function () 
-    {
-        var sliderVal = redNASlider.value / 50.0 - 2.0;
-        document.querySelector("#redNAText").textContent = sliderVal;
-        colorAddNeg[0] = sliderVal;
-    }, false);
-
-    grnNASlider.addEventListener('input', function () 
-    {
-        var sliderVal = grnNASlider.value / 50.0 - 2.0;
-        document.querySelector("#grnNAText").textContent = sliderVal;
-        colorAddNeg[1] = sliderVal;
-    }, false);
-
-    bluNASlider.addEventListener('input', function () 
-    {
-        var sliderVal = bluNASlider.value / 50.0 - 2.0;
-        document.querySelector("#bluNAText").textContent = sliderVal;
-        colorAddNeg[2] = sliderVal;
-    }, false);
     
     seqTextArea.addEventListener("input", function()
     {
@@ -176,8 +79,8 @@ function main()
     {
         if(modeTranslation && event.buttons & 1 != 0)
         {
-            var rangeX = spaceScale[0] * (4.0 - 0.0);
-            var rangeY = spaceScale[1] * (4.0 - 0.0);
+            let rangeX = spaceScale[0] * (4.0 - 0.0);
+            let rangeY = spaceScale[1] * (4.0 - 0.0);
 
             spaceTranslate[0] -= 0.2 * rangeX * event.movementX / standardWidth;
             spaceTranslate[1] += 0.2 * rangeY * event.movementY / standardHeight;
@@ -224,66 +127,72 @@ function main()
         modeTranslation = false;
     }
 
+    canvas.oncontextmenu = function()
+    {
+        let dataURL = canvas.toDataURL();
+        document.getElementById("canvasSaveImg").src = dataURL;
+    }
+
     radioButtonFire.onclick    = defaultTheme;
     radioButtonElectro.onclick = electroTheme;
     radioButtonClassic.onclick = classicTheme;
     radioButtonSepia.onclick   = sepiaTheme;
 
-    var seqStr   = seqTextArea.value;
-    var seqIndex = 0;
+    let seqStr   = seqTextArea.value;
+    let seqIndex = 0;
 
-    var modeTranslation    = false;
-    var currAnimationFrame = 0;
+    let modeTranslation    = false;
+    let currAnimationFrame = 0;
 
-    var spaceScale     = [2.0,  2.0]; //[-1, 1] -> [-2, 2]
-    var spaceTranslate = [2.0,  2.0]; //[-2, 2] -> [ 0, 4]; 
+    let spaceScale     = [2.0,  2.0]; //[-1, 1] -> [-2, 2]
+    let spaceTranslate = [2.0,  2.0]; //[-2, 2] -> [ 0, 4]; 
 
-    var colorMultiplyNeg = [-1.0, -1.0, -1.0,  1.0];
-    var colorAddNeg      = [ 0.0,  0.0,  0.0,  0.0];
-    var colorMultiplyPos = [ 1.0,  1.0,  1.0,  1.0];
-    var colorAddPos      = [ 0.0,  0.0,  0.0,  0.0];
+    let colorMultiplyNeg = [-1.0, -1.0, -1.0,  1.0];
+    let colorAddNeg      = [ 0.0,  0.0,  0.0,  0.0];
+    let colorMultiplyPos = [ 1.0,  1.0,  1.0,  1.0];
+    let colorAddPos      = [ 0.0,  0.0,  0.0,  0.0];
 
     const standardWidth  = canvas.clientWidth;
     const standardHeight = canvas.clientHeight;
     const textureWidth   = standardWidth  * 2;
     const textureHeight  = standardHeight * 2;
 
-    var resetShaderProgram    = null;
-    var lyapunovShaderProgram = null;
-    var finalShaderProgram    = null;
-    var staticShaderProgram   = null;
+    let resetShaderProgram    = null;
+    let lyapunovShaderProgram = null;
+    let finalShaderProgram    = null;
+    let staticShaderProgram   = null;
 
-    var lyapunovPrevXTextureLocation      = null;
-    var lyapunovPrevLambdaTextureLocation = null;
-    var finalLambdaTextureLocation        = null;
+    let lyapunovPrevXTextureLocation      = null;
+    let lyapunovPrevLambdaTextureLocation = null;
+    let finalLambdaTextureLocation        = null;
 
-    var lyapunovIndexUniformLocation = null;
-    var lyapunovSnUniformLocation    = null;
-    var resetSnUniformLocation       = null;
+    let lyapunovIndexUniformLocation = null;
+    let lyapunovSnUniformLocation    = null;
+    let resetSnUniformLocation       = null;
 
-    var resetScaleSpaceUniformLocation     = null;
-    var resetTranslateSpaceUniformLocation = null;
+    let resetScaleSpaceUniformLocation     = null;
+    let resetTranslateSpaceUniformLocation = null;
 
-    var lyapunovScaleSpaceUniformLocation     = null;
-    var lyapunovTranslateSpaceUniformLocation = null;
+    let lyapunovScaleSpaceUniformLocation     = null;
+    let lyapunovTranslateSpaceUniformLocation = null;
 
-    var colorMultiplyNegUniformLocation = null;
-    var colorAddNegUniformLocation      = null;
-    var colorMultiplyPosUniformLocation = null;
-    var colorAddPosUniformLocation      = null;
+    let colorMultiplyNegUniformLocation = null;
+    let colorAddNegUniformLocation      = null;
+    let colorMultiplyPosUniformLocation = null;
+    let colorAddPosUniformLocation      = null;
 
-    //var relativeTranslateUniformLocation = null;
+    //let relativeTranslateUniformLocation = null;
 
-    var xLambdaFrameBuffer = null;
+    let xLambdaFrameBuffer = null;
 
-    var xTex1      = null;
-    var xTex2      = null;
-    var lambdaTex1 = null;
-    var lambdaTex2 = null;
+    let xTex1      = null;
+    let xTex2      = null;
+    let lambdaTex1 = null;
+    let lambdaTex2 = null;
 
-    var resetVertexBuffer    = null;
-    var lyapunovVertexBuffer = null;
-    var finalVertexBuffer    = null;
+    let resetVertexBuffer    = null;
+    let lyapunovVertexBuffer = null;
+    let finalVertexBuffer    = null;
 
     defaultTheme();
 
@@ -537,7 +446,7 @@ function main()
             colorMain = mixColor * gColorMultiply + gColorAdd;
         }`;
 
-        var lyapunovVS = gl.createShader(gl.VERTEX_SHADER);
+        let lyapunovVS = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(lyapunovVS, vsLyapunovSource);
         gl.compileShader(lyapunovVS);
 
@@ -546,7 +455,7 @@ function main()
             alert(gl.getShaderInfoLog(lyapunovVS));
         }
 
-        var lyapunovFS = gl.createShader(gl.FRAGMENT_SHADER);
+        let lyapunovFS = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(lyapunovFS, fsLyapunovSource);
         gl.compileShader(lyapunovFS);
 
@@ -565,7 +474,7 @@ function main()
             alert(gl.getProgramInfoLog(lyapunovShaderProgram));
         }
 
-        var finalVS = gl.createShader(gl.VERTEX_SHADER);
+        let finalVS = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(finalVS, vsFinalSource);
         gl.compileShader(finalVS);
 
@@ -574,7 +483,7 @@ function main()
             alert(gl.getShaderInfoLog(finalVS));
         }
 
-        var finalFS = gl.createShader(gl.FRAGMENT_SHADER);
+        let finalFS = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(finalFS, fsFinalSource);
         gl.compileShader(finalFS);
 
@@ -593,7 +502,7 @@ function main()
             alert(gl.getProgramInfoLog(finalShaderProgram));
         }
 
-        var resetVS = gl.createShader(gl.VERTEX_SHADER);
+        let resetVS = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(resetVS, vsResetSource);
         gl.compileShader(resetVS);
 
@@ -602,7 +511,7 @@ function main()
             alert(gl.getShaderInfoLog(resetVS));
         }
 
-        var resetFS = gl.createShader(gl.FRAGMENT_SHADER);
+        let resetFS = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(resetFS, fsResetSource);
         gl.compileShader(resetFS);
 
@@ -621,7 +530,7 @@ function main()
             alert(gl.getProgramInfoLog(resetShaderProgram));
         }
 
-        var staticVS = gl.createShader(gl.VERTEX_SHADER);
+        let staticVS = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(staticVS, vsStaticSource);
         gl.compileShader(staticVS);
 
@@ -630,7 +539,7 @@ function main()
             alert(gl.getShaderInfoLog(staticVS));
         }
 
-        var staticFS = gl.createShader(gl.FRAGMENT_SHADER);
+        let staticFS = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(staticFS, fsStaticSource);
         gl.compileShader(staticFS);
 
@@ -688,27 +597,27 @@ function main()
                                            0.0, 1.0,
                                            1.0, 1.0]);
 
-        var attrib = 0;
+        let attrib = 0;
         lyapunovVertexBuffer = gl.createVertexArray();
         gl.bindVertexArray(lyapunovVertexBuffer);
 
         attrib = gl.getAttribLocation(lyapunovShaderProgram, "vScreenPos");
         gl.enableVertexAttribArray(attrib);
-        var posLyapunovBuffer = gl.createBuffer();
+        let posLyapunovBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, posLyapunovBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, posArray, gl.STATIC_DRAW);
         gl.vertexAttribPointer(attrib, 4, gl.FLOAT, false, 0, 0);
 
         attrib = gl.getAttribLocation(lyapunovShaderProgram, "vScreenAB");
         gl.enableVertexAttribArray(attrib);
-        var abLyapunovBuffer = gl.createBuffer();
+        let abLyapunovBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, abLyapunovBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, abArray, gl.STATIC_DRAW);
         gl.vertexAttribPointer(attrib, 2, gl.FLOAT, false, 0, 0);
 
         attrib = gl.getAttribLocation(lyapunovShaderProgram, "vScreenTex");
         gl.enableVertexAttribArray(attrib);
-        var texLyapunovBuffer = gl.createBuffer();
+        let texLyapunovBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, texLyapunovBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, texArray, gl.STATIC_DRAW);
         gl.vertexAttribPointer(attrib, 2, gl.FLOAT, false, 0, 0);
@@ -718,14 +627,14 @@ function main()
 
         attrib = gl.getAttribLocation(finalShaderProgram, "vScreenPos");
         gl.enableVertexAttribArray(attrib);
-        var posFinalBuffer = gl.createBuffer();
+        let posFinalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, posFinalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, posArray, gl.STATIC_DRAW);
         gl.vertexAttribPointer(attrib, 4, gl.FLOAT, false, 0, 0);
 
         attrib = gl.getAttribLocation(finalShaderProgram, "vScreenTex");
         gl.enableVertexAttribArray(attrib);
-        var texFinalBuffer = gl.createBuffer();
+        let texFinalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, texFinalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, texArray, gl.STATIC_DRAW);
         gl.vertexAttribPointer(attrib, 2, gl.FLOAT, false, 0, 0);
@@ -735,21 +644,21 @@ function main()
 
         attrib = gl.getAttribLocation(resetShaderProgram, "vScreenPos");
         gl.enableVertexAttribArray(attrib);
-        var posResetBuffer = gl.createBuffer();
+        let posResetBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, posResetBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, posArray, gl.STATIC_DRAW);
         gl.vertexAttribPointer(attrib, 4, gl.FLOAT, false, 0, 0);
 
         attrib = gl.getAttribLocation(resetShaderProgram, "vScreenAB");
         gl.enableVertexAttribArray(attrib);
-        var abResetBuffer = gl.createBuffer();
+        let abResetBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, abResetBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, abArray, gl.STATIC_DRAW);
         gl.vertexAttribPointer(attrib, 2, gl.FLOAT, false, 0, 0);
 
         attrib = gl.getAttribLocation(resetShaderProgram, "vScreenTex");
         gl.enableVertexAttribArray(attrib);
-        var texResetBuffer = gl.createBuffer();
+        let texResetBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, texResetBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, texArray, gl.STATIC_DRAW);
         gl.vertexAttribPointer(attrib, 2, gl.FLOAT, false, 0, 0);
@@ -788,7 +697,7 @@ function main()
 
     function mainDraw()
     {
-        var strIndex = seqIndex % seqStr.length;
+        let strIndex = seqIndex % seqStr.length;
 
         gl.viewport(0, 0, textureWidth, textureHeight);
         gl.bindVertexArray(lyapunovVertexBuffer);
@@ -906,8 +815,6 @@ function main()
         colorAddNeg      = [ 0.0, -1.0, -2.0,  0.0];
         colorMultiplyPos = [ 1.0,  1.0,  1.0,  1.0];
         colorAddPos      = [ 0.0, -1.0, -2.0,  0.0];
-
-        updateSliders();
     }
 
     function electroTheme()
@@ -916,8 +823,6 @@ function main()
         colorAddNeg      = [ 0.0,  0.0,  0.0,  0.0];
         colorMultiplyPos = [ 0.5,  0.1,  1.0,  1.0];
         colorAddPos      = [ 0.0,  0.0,  0.0,  0.0];
-
-        updateSliders();
     }
 
     function classicTheme()
@@ -926,8 +831,6 @@ function main()
         colorAddNeg      = [ 1.00,  1.00,  0.00,  0.00];
         colorMultiplyPos = [ 0.00,  0.00,  2.00,  1.00];
         colorAddPos      = [ 0.00,  0.00,  0.00,  0.00];
-
-        updateSliders();
     }
 
     function sepiaTheme()
@@ -936,43 +839,12 @@ function main()
         colorAddNeg      = [ 0.74,  0.58,  0.41, 0.0];
         colorMultiplyPos = [ 0.22,  0.18,  0.70, 1.0];
         colorAddPos      = [ 0.28,  0.26,  0.25, 0.0];
-
-        updateSliders();
-    }
-
-    function updateSliders()
-    {
-        redPMSlider.value = (colorMultiplyPos[0] + 2.0) * 50;
-        grnPMSlider.value = (colorMultiplyPos[1] + 2.0) * 50;
-        bluPMSlider.value = (colorMultiplyPos[2] + 2.0) * 50;
-        redPASlider.value = (colorAddPos[0]      + 2.0) * 50;
-        grnPASlider.value = (colorAddPos[1]      + 2.0) * 50;
-        bluPASlider.value = (colorAddPos[2]      + 2.0) * 50;
-        redNMSlider.value = (colorMultiplyNeg[0] + 2.0) * 50;
-        grnNMSlider.value = (colorMultiplyNeg[1] + 2.0) * 50;
-        bluNMSlider.value = (colorMultiplyNeg[2] + 2.0) * 50;
-        redNASlider.value = (colorAddNeg[0]      + 2.0) * 50;
-        grnNASlider.value = (colorAddNeg[1]      + 2.0) * 50;
-        bluNASlider.value = (colorAddNeg[2]      + 2.0) * 50;
-
-        document.querySelector("#redPMText").textContent = colorMultiplyPos[0];
-        document.querySelector("#grnPMText").textContent = colorMultiplyPos[1];
-        document.querySelector("#bluPMText").textContent = colorMultiplyPos[2];
-        document.querySelector("#redPAText").textContent = colorAddPos[0];
-        document.querySelector("#grnPAText").textContent = colorAddPos[1];
-        document.querySelector("#bluPAText").textContent = colorAddPos[2];
-        document.querySelector("#redNMText").textContent = colorMultiplyNeg[0];
-        document.querySelector("#grnNMText").textContent = colorMultiplyNeg[1];
-        document.querySelector("#bluNMText").textContent = colorMultiplyNeg[2];
-        document.querySelector("#redNAText").textContent = colorAddNeg[0];
-        document.querySelector("#grnNAText").textContent = colorAddNeg[1];
-        document.querySelector("#bluNAText").textContent = colorAddNeg[2];
     }
 
     //=================================================== Util functions ===================================================\\
     function swapBuffers()
     {
-        var tmp = null;
+        let tmp = null;
 
         tmp = xTex1;
         xTex1 = xTex2;
@@ -985,15 +857,15 @@ function main()
 
     function domainString()
     {
-        var leftX   = (-1.0 * spaceScale[0] + spaceTranslate[0]).toFixed(2);
-        var rightX  = ( 1.0 * spaceScale[0] + spaceTranslate[0]).toFixed(2);
-        var bottomY = (-1.0 * spaceScale[1] + spaceTranslate[1]).toFixed(2);
-        var topY    = ( 1.0 * spaceScale[1] + spaceTranslate[1]).toFixed(2);
+        let leftX   = (-1.0 * spaceScale[0] + spaceTranslate[0]).toFixed(2);
+        let rightX  = ( 1.0 * spaceScale[0] + spaceTranslate[0]).toFixed(2);
+        let bottomY = (-1.0 * spaceScale[1] + spaceTranslate[1]).toFixed(2);
+        let topY    = ( 1.0 * spaceScale[1] + spaceTranslate[1]).toFixed(2);
 
-        var leftStr   = String(leftX);
-        var rightStr  = String(rightX);
-        var bottomStr = String(bottomY);
-        var topStr    = String(topY);
+        let leftStr   = String(leftX);
+        let rightStr  = String(rightX);
+        let bottomStr = String(bottomY);
+        let topStr    = String(topY);
 
         if(leftStr[0] != "-")
         {
