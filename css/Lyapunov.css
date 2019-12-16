@@ -46,6 +46,12 @@ div.domaintext
     margin-top: -8pt;
 }
 
+div.colorControlSlider
+{
+    display:        flex;
+    flex-direction: row;
+}
+
 textarea
 {
     background-color: black;
@@ -61,10 +67,34 @@ textarea
     font-size: 36pt;
 }
 
-p
+p.domainval
 {
     color: wheat;
 
     font-family: "Lucida Console", Monaco, monospace;
     font-size: 16pt;
+}
+
+p.pr
+{
+    color: red;
+
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 8pt;
+}
+
+p.pg
+{
+    color: green;
+
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 8pt;
+}
+
+p.pb
+{
+    color: blue;
+
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 8pt;
 }

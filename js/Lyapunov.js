@@ -24,6 +24,103 @@ function main()
         return;
     }
 
+    var redNMSlider = document.querySelector("#redNM");
+    var grnNMSlider = document.querySelector("#grnNM"); 
+    var bluNMSlider = document.querySelector("#bluNM"); 
+    var redNASlider = document.querySelector("#redNA"); 
+    var grnNASlider = document.querySelector("#grnNA"); 
+    var bluNASlider = document.querySelector("#bluNA"); 
+    var redPMSlider = document.querySelector("#redPM");
+    var grnPMSlider = document.querySelector("#grnPM"); 
+    var bluPMSlider = document.querySelector("#bluPM");
+    var redPASlider = document.querySelector("#redPA"); 
+    var grnPASlider = document.querySelector("#grnPA"); 
+    var bluPASlider = document.querySelector("#bluPA"); 
+
+    redPMSlider.addEventListener('input', function () 
+    {
+        var sliderVal = redPMSlider.value / 50.0 - 2.0;
+        document.querySelector("#redPMText").textContent = sliderVal;
+        colorMultiplyPos[0] = sliderVal;
+    }, false);
+
+    grnPMSlider.addEventListener('input', function () 
+    {
+        var sliderVal = grnPMSlider.value / 50.0 - 2.0;
+        document.querySelector("#grnPMText").textContent = sliderVal;
+        colorMultiplyPos[1] = sliderVal;
+    }, false);
+
+    bluPMSlider.addEventListener('input', function () 
+    {
+        var sliderVal = bluPMSlider.value / 50.0 - 2.0;
+        document.querySelector("#bluPMText").textContent = sliderVal;
+        colorMultiplyPos[2] = sliderVal;
+    }, false);
+
+    redPASlider.addEventListener('input', function () 
+    {
+        var sliderVal = redPASlider.value / 50.0 - 2.0;
+        document.querySelector("#redPAText").textContent = sliderVal;
+        colorAddPos[0] = sliderVal;
+    }, false);
+
+    grnPASlider.addEventListener('input', function () 
+    {
+        var sliderVal = grnPASlider.value / 50.0 - 2.0;
+        document.querySelector("#grnPAText").textContent = sliderVal;
+        colorAddPos[1] = sliderVal;
+    }, false);
+
+    bluPASlider.addEventListener('input', function () 
+    {
+        var sliderVal = bluPASlider.value / 50.0 - 2.0;
+        document.querySelector("#bluPAText").textContent = sliderVal;
+        colorAddPos[2] = sliderVal;
+    }, false);
+    
+    redNMSlider.addEventListener('input', function () 
+    {
+        var sliderVal = redNMSlider.value / 50.0 - 2.0;
+        document.querySelector("#redNMText").textContent = sliderVal;
+        colorMultiplyNeg[0] = sliderVal;
+    }, false);
+
+    grnNMSlider.addEventListener('input', function () 
+    {
+        var sliderVal = grnNMSlider.value / 50.0 - 2.0;
+        document.querySelector("#grnNMText").textContent = sliderVal;
+        colorMultiplyNeg[1] = sliderVal;
+    }, false);
+
+    bluNMSlider.addEventListener('input', function () 
+    {
+        var sliderVal = bluNMSlider.value / 50.0 - 2.0;
+        document.querySelector("#bluNMText").textContent = sliderVal;
+        colorMultiplyNeg[2] = sliderVal;
+    }, false);
+
+    redNASlider.addEventListener('input', function () 
+    {
+        var sliderVal = redNASlider.value / 50.0 - 2.0;
+        document.querySelector("#redNAText").textContent = sliderVal;
+        colorAddNeg[0] = sliderVal;
+    }, false);
+
+    grnNASlider.addEventListener('input', function () 
+    {
+        var sliderVal = grnNASlider.value / 50.0 - 2.0;
+        document.querySelector("#grnNAText").textContent = sliderVal;
+        colorAddNeg[1] = sliderVal;
+    }, false);
+
+    bluNASlider.addEventListener('input', function () 
+    {
+        var sliderVal = bluNASlider.value / 50.0 - 2.0;
+        document.querySelector("#bluNAText").textContent = sliderVal;
+        colorAddNeg[2] = sliderVal;
+    }, false);
+    
     seqTextArea.addEventListener("input", function()
     {
         window.cancelAnimationFrame(currAnimationFrame);
@@ -57,30 +154,8 @@ function main()
 
         console.log(event.deltaY);
 
-        var prevSpaceScaleX = spaceScale[0];
-        var prevSpaceScaleY = spaceScale[1];
-
-        var currSpaceScaleX = prevSpaceScaleX * Math.pow(1.05, event.deltaY * 0.2);
-        var currSpaceScaleY = prevSpaceScaleY * Math.pow(1.05, event.deltaY * 0.2);
-
-        //Jumping over [2, 2] case
-        if((prevSpaceScaleX > 2.0 && currSpaceScaleX < 2.0 && prevSpaceScaleY > 2.0 && currSpaceScaleY < 2.0)
-        || (prevSpaceScaleX < 2.0 && currSpaceScaleX > 2.0 && prevSpaceScaleY < 2.0 && currSpaceScaleY > 2.0))
-        {
-            spaceScale[0] = 2.0;
-            spaceScale[1] = 2.0;
-        }
-        else if((prevSpaceScaleX > 1.0 && currSpaceScaleX < 1.0 && prevSpaceScaleY > 1.0 && currSpaceScaleY < 1.0)
-             || (prevSpaceScaleX < 1.0 && currSpaceScaleX > 1.0 && prevSpaceScaleY < 1.0 && currSpaceScaleY > 1.0))
-        {
-            spaceScale[0] = 1.0;
-            spaceScale[1] = 1.0;
-        }
-        else
-        {
-            spaceScale[0] = currSpaceScaleX;
-            spaceScale[1] = currSpaceScaleY;
-        }
+        spaceScale[0] = spaceScale[0] * Math.pow(1.05, event.deltaY * 0.2);
+        spaceScale[1] = spaceScale[1] * Math.pow(1.05, event.deltaY * 0.2);
 
         domainText.textContent = domainString(); 
 
@@ -121,7 +196,7 @@ function main()
         }
     }
 
-    buttonResetDefault.onmouseup = function(event)
+    buttonResetDefault.onmouseup = function()
     {
         cancelAnimationFrame(currAnimationFrame);
 
@@ -132,10 +207,10 @@ function main()
 
         resetValues();
         currAnimationFrame = window.requestAnimationFrame(mainDraw);
-        zoomForbidden = false;
+        modeTranslation = false;
     }
 
-    buttonResetNegative.onmouseup = function(event)
+    buttonResetNegative.onmouseup = function()
     {
         cancelAnimationFrame(currAnimationFrame);
 
@@ -146,40 +221,13 @@ function main()
 
         resetValues();
         currAnimationFrame = window.requestAnimationFrame(mainDraw);
-        zoomForbidden = false;
+        modeTranslation = false;
     }
 
-    radioButtonFire.onclick = function()
-    {
-        colorMultiplyNeg = [-1.0, -1.0, -1.0,  1.0];
-        colorAddNeg      = [ 0.0, -1.0, -2.0,  0.0];
-        colorMultiplyPos = [ 1.0,  1.0,  1.0,  1.0];
-        colorAddPos      = [ 0.0, -1.0, -2.0,  0.0];
-    }
-
-    radioButtonElectro.onclick = function()
-    {
-        colorMultiplyNeg = [-0.5, -0.1, -1.0,  1.0];
-        colorAddNeg      = [ 0.0,  0.0,  0.0,  0.0];
-        colorMultiplyPos = [ 0.5,  0.1,  1.0,  1.0];
-        colorAddPos      = [ 0.0,  0.0,  0.0,  0.0];
-    }
-
-    radioButtonClassic.onclick = function()
-    {
-        colorMultiplyNeg = [ 0.25,  0.25,  0.00,  1.00];
-        colorAddNeg      = [ 1.00,  1.00,  0.00,  0.00];
-        colorMultiplyPos = [ 0.00,  0.00,  2.00,  1.00];
-        colorAddPos      = [ 0.00,  0.00,  0.00,  0.00];
-    }
-    
-    radioButtonSepia.onclick = function()
-    {
-        colorMultiplyNeg = [ 0.22,  0.18,  0.70, 1.0];
-        colorAddNeg      = [ 0.74,  0.58,  0.41, 0.0];
-        colorMultiplyPos = [ 0.22,  0.18,  0.70, 1.0];
-        colorAddPos      = [ 0.28,  0.26,  0.25, 0.0];
-    }
+    radioButtonFire.onclick    = defaultTheme;
+    radioButtonElectro.onclick = electroTheme;
+    radioButtonClassic.onclick = classicTheme;
+    radioButtonSepia.onclick   = sepiaTheme;
 
     var seqStr   = seqTextArea.value;
     var seqIndex = 0;
@@ -191,9 +239,9 @@ function main()
     var spaceTranslate = [2.0,  2.0]; //[-2, 2] -> [ 0, 4]; 
 
     var colorMultiplyNeg = [-1.0, -1.0, -1.0,  1.0];
-    var colorAddNeg      = [ 0.0, -1.0, -2.0,  0.0];
+    var colorAddNeg      = [ 0.0,  0.0,  0.0,  0.0];
     var colorMultiplyPos = [ 1.0,  1.0,  1.0,  1.0];
-    var colorAddPos      = [ 0.0, -1.0, -2.0,  0.0];
+    var colorAddPos      = [ 0.0,  0.0,  0.0,  0.0];
 
     const standardWidth  = canvas.clientWidth;
     const standardHeight = canvas.clientHeight;
@@ -224,7 +272,7 @@ function main()
     var colorMultiplyPosUniformLocation = null;
     var colorAddPosUniformLocation      = null;
 
-    var relativeTranslateUniformLocation = null;
+    //var relativeTranslateUniformLocation = null;
 
     var xLambdaFrameBuffer = null;
 
@@ -236,6 +284,8 @@ function main()
     var resetVertexBuffer    = null;
     var lyapunovVertexBuffer = null;
     var finalVertexBuffer    = null;
+
+    defaultTheme();
 
     createShaders();
     createTextures();
@@ -344,8 +394,11 @@ function main()
             highp float prevCoeff = float(gIndex - 1u) / float(gIndex);
             highp float thisCoeff = 1.0f               / float(gIndex);
         
+            highp float phase = abs(rn * (1.0f - 2.0f * xn)); 
+            phase             = max(phase, 1.0e-36); //To counter log(0) case (if you disable this, you'll see white pixels everywhere)
+
             oNextX      = rn * xn * (1.0f - xn);
-            oNextLambda = prevCoeff * lambdan + thisCoeff * log(abs(rn * (1.0f - 2.0f * xn)));
+            oNextLambda = prevCoeff * lambdan + thisCoeff * log(phase);
         }`;
 
         const vsFinalSource = 
@@ -615,7 +668,7 @@ function main()
         colorMultiplyPosUniformLocation = gl.getUniformLocation(finalShaderProgram, "gColorMultiplyPos");
         colorAddPosUniformLocation      = gl.getUniformLocation(finalShaderProgram, "gColorAddPos");
 
-        relativeTranslateUniformLocation = gl.getUniformLocation(staticShaderProgram, "gRelativeTranslate");
+        //relativeTranslateUniformLocation = gl.getUniformLocation(staticShaderProgram, "gRelativeTranslate");
     }
 
     function createBuffers()
@@ -815,6 +868,7 @@ function main()
         currAnimationFrame = window.requestAnimationFrame(mainDraw);
     }
 
+    /*
     function staticDraw()
     {
         gl.useProgram(staticShaderProgram);
@@ -841,6 +895,77 @@ function main()
 
         gl.drawBuffers([gl.BACK]);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }*/
+
+    //=================================================== Theme functions ===================================================\\
+
+    function defaultTheme()
+    {
+        colorMultiplyNeg = [-1.0, -1.0, -1.0,  1.0];
+        colorAddNeg      = [ 0.0, -1.0, -2.0,  0.0];
+        colorMultiplyPos = [ 1.0,  1.0,  1.0,  1.0];
+        colorAddPos      = [ 0.0, -1.0, -2.0,  0.0];
+
+        updateSliders();
+    }
+
+    function electroTheme()
+    {
+        colorMultiplyNeg = [-0.5, -0.1, -1.0,  1.0];
+        colorAddNeg      = [ 0.0,  0.0,  0.0,  0.0];
+        colorMultiplyPos = [ 0.5,  0.1,  1.0,  1.0];
+        colorAddPos      = [ 0.0,  0.0,  0.0,  0.0];
+
+        updateSliders();
+    }
+
+    function classicTheme()
+    {
+        colorMultiplyNeg = [ 0.25,  0.25,  0.00,  1.00];
+        colorAddNeg      = [ 1.00,  1.00,  0.00,  0.00];
+        colorMultiplyPos = [ 0.00,  0.00,  2.00,  1.00];
+        colorAddPos      = [ 0.00,  0.00,  0.00,  0.00];
+
+        updateSliders();
+    }
+
+    function sepiaTheme()
+    {
+        colorMultiplyNeg = [ 0.22,  0.18,  0.70, 1.0];
+        colorAddNeg      = [ 0.74,  0.58,  0.41, 0.0];
+        colorMultiplyPos = [ 0.22,  0.18,  0.70, 1.0];
+        colorAddPos      = [ 0.28,  0.26,  0.25, 0.0];
+
+        updateSliders();
+    }
+
+    function updateSliders()
+    {
+        redPMSlider.value = (colorMultiplyPos[0] + 2.0) * 50;
+        grnPMSlider.value = (colorMultiplyPos[1] + 2.0) * 50;
+        bluPMSlider.value = (colorMultiplyPos[2] + 2.0) * 50;
+        redPASlider.value = (colorAddPos[0]      + 2.0) * 50;
+        grnPASlider.value = (colorAddPos[1]      + 2.0) * 50;
+        bluPASlider.value = (colorAddPos[2]      + 2.0) * 50;
+        redNMSlider.value = (colorMultiplyNeg[0] + 2.0) * 50;
+        grnNMSlider.value = (colorMultiplyNeg[1] + 2.0) * 50;
+        bluNMSlider.value = (colorMultiplyNeg[2] + 2.0) * 50;
+        redNASlider.value = (colorAddNeg[0]      + 2.0) * 50;
+        grnNASlider.value = (colorAddNeg[1]      + 2.0) * 50;
+        bluNASlider.value = (colorAddNeg[2]      + 2.0) * 50;
+
+        document.querySelector("#redPMText").textContent = colorMultiplyPos[0];
+        document.querySelector("#grnPMText").textContent = colorMultiplyPos[1];
+        document.querySelector("#bluPMText").textContent = colorMultiplyPos[2];
+        document.querySelector("#redPAText").textContent = colorAddPos[0];
+        document.querySelector("#grnPAText").textContent = colorAddPos[1];
+        document.querySelector("#bluPAText").textContent = colorAddPos[2];
+        document.querySelector("#redNMText").textContent = colorMultiplyNeg[0];
+        document.querySelector("#grnNMText").textContent = colorMultiplyNeg[1];
+        document.querySelector("#bluNMText").textContent = colorMultiplyNeg[2];
+        document.querySelector("#redNAText").textContent = colorAddNeg[0];
+        document.querySelector("#grnNAText").textContent = colorAddNeg[1];
+        document.querySelector("#bluNAText").textContent = colorAddNeg[2];
     }
 
     //=================================================== Util functions ===================================================\\
