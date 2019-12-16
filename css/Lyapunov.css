@@ -5,32 +5,45 @@ body
 
 div.container
 {
-    display: flex;
+    display:        flex;
+    flex-direction: row;
+    flex-wrap:      wrap;
 }
 
-div.leftside
+div.displayparameters
 {
-    width: fit-content;
-    float: left;
+    display:        flex;
+    flex-direction: row;
+    flex-grow:      1;
 }
 
-div.rightside
+div.themebuttons
 {
-    float: right;
-    margin-left: 20px;
-    display: flex;
-    width: 100%;
+    display:        flex;
+    flex-direction: column;
 }
 
-div.radiobuttons
+div.controlcontainer
 {
-    display: inline-block;
-    width: 10%;
+    display:        flex;
+    flex-direction: column;
 }
 
-div.radiobuttons input
+div.domaincontainer
 {
-    width: 100%;
+    display:        flex;
+    flex-direction: row;
+}
+
+div.resetButtons
+{
+    display:        flex;
+    flex-direction: column;
+}
+
+div.domaintext
+{
+    margin-top: -8pt;
 }
 
 textarea
@@ -42,15 +55,16 @@ textarea
     border-radius: 10px;
 
     float: left;
-
-    width: 90%;
     height: auto;
 
-    font-family: Arial Rounded MT Bold, Helvetica Rounded, Arial, sans-serif;
-    font-size: 48px;
+    font-family: "Arial Rounded MT Bold", Arial, sans-serif;
+    font-size: 36pt;
 }
 
 p
 {
-    color: yellow;
+    color: wheat;
+
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 16pt;
 }

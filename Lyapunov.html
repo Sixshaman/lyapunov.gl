@@ -3,23 +3,37 @@
 <head>
     <meta charset="utf-8"/>
     <title>Lyapunov Fractal</title>
-    <script src="js/Lyapunov.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/Lyapunov.css"> 
+    <script src="js/Lyapunov.js?ver=1.1"></script>
+    <link rel="stylesheet" type="text/css" href="css/Lyapunov.css?ver=1.1"> 
 </head>
 
 <body>
     <div class="container">
-        <div class="leftside">
+        <div class="canvascontainer">
             <canvas id="LyapunovCanvas" width="900" height="900"></canvas>
         </div>
 
-        <div class="rightside">
-            <textarea id="LyapunovSequence" spellcheck="false">AB</textarea>
-            <div class="radiobuttons">
-                <input type="radio" name="theme" value="Fire"    id="RadioThemeFire"    checked></input>
-                <input type="radio" name="theme" value="Electro" id="RadioThemeElectro"        ></input>
-                <input type="radio" name="theme" value="Classic" id="RadioThemeClassic"        ></input>
-                <input type="radio" name="theme" value="Classic" id="RadioThemeSepia"          ></input>
+        <div class="displayparameters">
+            <div class="controlcontainer">
+                <div class="sequencecontainer">
+                    <textarea id="LyapunovSequence" spellcheck="false">AB</textarea>
+                </div>
+                <div class="domaincontainer">
+                    <div class="resetButtons">
+                        <button type="button" id="ResetDefault">Reset to default</button>
+                        <button type="button" id="ResetNegative">Reset to negative</button>
+                    </div>
+                    
+                    <div class="domaintext">
+                        <p id="domain">[&nbsp0.00,&nbsp4.00] x [&nbsp0.00,&nbsp4.00]</p>
+                    </div>
+                </div>
+            </div>
+            <div class="themebuttons">
+                    <input type="radio" name="theme" value="Fire"    id="RadioThemeFire"    checked></input>
+                    <input type="radio" name="theme" value="Electro" id="RadioThemeElectro"        ></input>
+                    <input type="radio" name="theme" value="Classic" id="RadioThemeClassic"        ></input>
+                    <input type="radio" name="theme" value="Classic" id="RadioThemeSepia"          ></input>
             </div>
         </div>
     </div>

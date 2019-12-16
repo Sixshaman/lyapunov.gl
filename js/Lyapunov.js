@@ -10,6 +10,11 @@ function main()
     const radioButtonClassic = document.querySelector("#RadioThemeClassic");
     const radioButtonSepia   = document.querySelector("#RadioThemeSepia");
 
+    const domainText = document.querySelector("#domain");
+
+    const buttonResetDefault  = document.querySelector("#ResetDefault");
+    const buttonResetNegative = document.querySelector("#ResetNegative");
+
     const gl             = canvas.getContext("webgl2");
     const extFloatTex    = gl.getExtension("EXT_color_buffer_float");
     const extLinFloatTex = gl.getExtension("OES_texture_float_linear");
@@ -41,6 +46,11 @@ function main()
 
     canvas.onwheel = function(event)
     {
+        if(modeTranslation || event.ctrlKey)
+        {
+            return;
+        }
+
         event.preventDefault();
 
         window.cancelAnimationFrame(currAnimationFrame);
@@ -72,31 +82,71 @@ function main()
             spaceScale[1] = currSpaceScaleY;
         }
 
+        domainText.textContent = domainString(); 
+
         resetValues();
         currAnimationFrame = window.requestAnimationFrame(mainDraw);
     }
 
     canvas.onmousedown = function(event)
     {
-        cancelAnimationFrame(currAnimationFrame);
+        if(event.button == 0)
+        {
+            cancelAnimationFrame(currAnimationFrame);
+            modeTranslation = true;
+        }
     }
 
     canvas.onmousemove = function(event)
     {
-        if(event.buttons & 1 != 0)
+        if(modeTranslation && event.buttons & 1 != 0)
         {
             var rangeX = spaceScale[0] * (4.0 - 0.0);
             var rangeY = spaceScale[1] * (4.0 - 0.0);
 
             spaceTranslate[0] -= 0.2 * rangeX * event.movementX / standardWidth;
             spaceTranslate[1] += 0.2 * rangeY * event.movementY / standardHeight;
+
+            domainText.textContent = domainString(); 
         }
     }
 
-    canvas.onmouseup = function(event)
+    window.onmouseup = function(event)
     {
+        if(modeTranslation && event.button == 0)
+        {
+            resetValues();
+            currAnimationFrame = window.requestAnimationFrame(mainDraw);
+            modeTranslation = false;
+        }
+    }
+
+    buttonResetDefault.onmouseup = function(event)
+    {
+        cancelAnimationFrame(currAnimationFrame);
+
+        spaceScale     = [2.0,  2.0]; //[-1, 1] -> [-2, 2]
+        spaceTranslate = [2.0,  2.0]; //[-2, 2] -> [ 0, 4]; 
+
+        domainText.textContent = domainString();
+
         resetValues();
         currAnimationFrame = window.requestAnimationFrame(mainDraw);
+        zoomForbidden = false;
+    }
+
+    buttonResetNegative.onmouseup = function(event)
+    {
+        cancelAnimationFrame(currAnimationFrame);
+
+        spaceScale     = [ 1.0,  1.0]; //[-1, 1] -> [-1, 1]
+        spaceTranslate = [-1.0, -1.0]; //[-1, 1] -> [-2, 0]; 
+
+        domainText.textContent = domainString();
+
+        resetValues();
+        currAnimationFrame = window.requestAnimationFrame(mainDraw);
+        zoomForbidden = false;
     }
 
     radioButtonFire.onclick = function()
@@ -134,6 +184,7 @@ function main()
     var seqStr   = seqTextArea.value;
     var seqIndex = 0;
 
+    var modeTranslation    = false;
     var currAnimationFrame = 0;
 
     var spaceScale     = [2.0,  2.0]; //[-1, 1] -> [-2, 2]
@@ -804,5 +855,40 @@ function main()
         tmp = lambdaTex1;
         lambdaTex1 = lambdaTex2;
         lambdaTex2 = tmp;
+    }
+
+    function domainString()
+    {
+        var leftX   = (-1.0 * spaceScale[0] + spaceTranslate[0]).toFixed(2);
+        var rightX  = ( 1.0 * spaceScale[0] + spaceTranslate[0]).toFixed(2);
+        var bottomY = (-1.0 * spaceScale[1] + spaceTranslate[1]).toFixed(2);
+        var topY    = ( 1.0 * spaceScale[1] + spaceTranslate[1]).toFixed(2);
+
+        var leftStr   = String(leftX);
+        var rightStr  = String(rightX);
+        var bottomStr = String(bottomY);
+        var topStr    = String(topY);
+
+        if(leftStr[0] != "-")
+        {
+            leftStr = " " + leftStr; //Leading spacebar to pad negative minus
+        }
+
+        if(rightStr[0] != "-")
+        {
+            rightStr = " " + rightStr; //Leading spacebar to pad negative minus
+        }
+
+        if(bottomStr[0] != "-")
+        {
+            bottomStr = " " + bottomStr; //Leading spacebar to pad negative minus
+        }
+
+        if(topStr[0] != "-")
+        {
+            topStr = " " + topStr; //Leading spacebar to pad negative minus
+        }
+
+        return "[" + leftStr + "," + bottomStr + "] x [" + rightStr + "," + topStr + "]";
     }
 }
