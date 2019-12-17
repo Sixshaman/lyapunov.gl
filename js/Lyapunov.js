@@ -15,6 +15,8 @@ function main()
     const buttonResetDefault  = document.querySelector("#ResetDefault");
     const buttonResetNegative = document.querySelector("#ResetNegative");
 
+    const imgToSave = document.getElementById("LyapunovImageToSave");
+
     const gl             = canvas.getContext("webgl2");
     const extFloatTex    = gl.getExtension("EXT_color_buffer_float");
     const extLinFloatTex = gl.getExtension("OES_texture_float_linear");
@@ -70,8 +72,14 @@ function main()
     {
         if(event.button == 0)
         {
+            translationStart = [event.x, event.y];
+            translationCurr  = [event.x, event.y];
+
             cancelAnimationFrame(currAnimationFrame);
             modeTranslation = true;
+
+            drawStaticTexture();
+            currAnimationFrame = window.requestAnimationFrame(staticDisplay);
         }
     }
 
@@ -79,13 +87,20 @@ function main()
     {
         if(modeTranslation && event.buttons & 1 != 0)
         {
-            let rangeX = spaceScale[0] * (4.0 - 0.0);
-            let rangeY = spaceScale[1] * (4.0 - 0.0);
+            const rangeX = spaceScale[0] * (4.0 - 0.0);
+            const rangeY = spaceScale[1] * (4.0 - 0.0);
 
-            spaceTranslate[0] -= 0.2 * rangeX * event.movementX / standardWidth;
-            spaceTranslate[1] += 0.2 * rangeY * event.movementY / standardHeight;
+            const translationFactor = 0.2;
 
-            domainText.textContent = domainString(); 
+            translationCurr[0] += event.movementX * translationFactor * 2;
+            translationCurr[1] += event.movementY * translationFactor * 2;
+
+            spaceTranslate[0] -= translationFactor * rangeX * event.movementX / standardWidth;
+            spaceTranslate[1] += translationFactor * rangeY * event.movementY / standardHeight;
+
+            domainText.textContent = domainString();
+
+            currAnimationFrame = window.requestAnimationFrame(staticDisplay);
         }
     }
 
@@ -93,13 +108,14 @@ function main()
     {
         if(modeTranslation && event.button == 0)
         {
+            cancelAnimationFrame(currAnimationFrame);
             resetValues();
             currAnimationFrame = window.requestAnimationFrame(mainDraw);
             modeTranslation = false;
         }
     }
 
-    buttonResetDefault.onmouseup = function()
+    buttonResetDefault.onclick = function()
     {
         cancelAnimationFrame(currAnimationFrame);
 
@@ -113,7 +129,7 @@ function main()
         modeTranslation = false;
     }
 
-    buttonResetNegative.onmouseup = function()
+    buttonResetNegative.onclick = function()
     {
         cancelAnimationFrame(currAnimationFrame);
 
@@ -127,12 +143,6 @@ function main()
         modeTranslation = false;
     }
 
-    canvas.oncontextmenu = function()
-    {
-        let dataURL = canvas.toDataURL();
-        document.getElementById("canvasSaveImg").src = dataURL;
-    }
-
     radioButtonFire.onclick    = defaultTheme;
     radioButtonElectro.onclick = electroTheme;
     radioButtonClassic.onclick = classicTheme;
@@ -143,6 +153,9 @@ function main()
 
     let modeTranslation    = false;
     let currAnimationFrame = 0;
+
+    let translationStart = [0, 0];
+    let translationCurr  = [0, 0];
 
     let spaceScale     = [2.0,  2.0]; //[-1, 1] -> [-2, 2]
     let spaceTranslate = [2.0,  2.0]; //[-2, 2] -> [ 0, 4]; 
@@ -165,6 +178,7 @@ function main()
     let lyapunovPrevXTextureLocation      = null;
     let lyapunovPrevLambdaTextureLocation = null;
     let finalLambdaTextureLocation        = null;
+    let staticImageTextureLocation        = null;
 
     let lyapunovIndexUniformLocation = null;
     let lyapunovSnUniformLocation    = null;
@@ -183,12 +197,15 @@ function main()
 
     //let relativeTranslateUniformLocation = null;
 
-    let xLambdaFrameBuffer = null;
+    let xLambdaFrameBuffer     = null;
+    let staticImageFrameBuffer = null;
 
     let xTex1      = null;
     let xTex2      = null;
     let lambdaTex1 = null;
     let lambdaTex2 = null;
+
+    let staticTex = null;
 
     let resetVertexBuffer    = null;
     let lyapunovVertexBuffer = null;
@@ -209,6 +226,7 @@ function main()
         xTex2 = gl.createTexture();
         lambdaTex1 = gl.createTexture();
         lambdaTex2 = gl.createTexture();
+        staticTex  = gl.createTexture();
 
         gl.bindTexture(gl.TEXTURE_2D, xTex1);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, textureWidth, textureHeight, 0, gl.RED, gl.FLOAT, null);
@@ -242,10 +260,19 @@ function main()
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
 
+        gl.bindTexture(gl.TEXTURE_2D, staticTex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, standardWidth, standardHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,     gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T,     gl.CLAMP_TO_EDGE);
+
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
-        xLambdaFrameBuffer = gl.createFramebuffer();
+        xLambdaFrameBuffer     = gl.createFramebuffer();
+        staticImageFrameBuffer = gl.createFramebuffer();
     }
 
     function createShaders()
@@ -407,14 +434,14 @@ function main()
         `#version 300 es
 
         layout(location=0) in mediump vec4 vScreenPos;
-        layout(location=2) in mediump vec2 vScreenTex;
+        layout(location=1) in mediump vec2 vScreenTex;
 
         out highp vec2 vSpacePosition;
         out highp vec2 vTexCoord;
 
         uniform highp vec2 gRelativeTranslate;
 
-        void main(void) 
+        void main(void)
         {
             gl_Position = vScreenPos;
             vTexCoord   = vScreenTex + gRelativeTranslate;
@@ -423,11 +450,7 @@ function main()
         const fsStaticSource = 
         `#version 300 es
 	
-        uniform highp sampler2D gLambdaTex;
-        
-        uniform lowp vec4 gColorMultiply;
-        uniform lowp vec4 gColorAdd;
-        uniform lowp vec4 gColorAbsMix;
+        uniform highp sampler2D gStaticImageTex;
         
         in mediump vec2 vTexCoord;
         
@@ -435,15 +458,7 @@ function main()
         
         void main(void)
         {
-            highp float lambda = texture(gLambdaTex, vTexCoord).x;
-        
-            //To choose between abs(lambda) and lambda as color source
-            highp vec4 baseColor = vec4(lambda, lambda, lambda, 1.0f);
-            highp vec4 absColor  = abs(baseColor);
-            
-            lowp vec4 mixColor = mix(baseColor, absColor, gColorAbsMix);
-            
-            colorMain = mixColor * gColorMultiply + gColorAdd;
+            colorMain = texture(gStaticImageTex, vTexCoord);
         }`;
 
         let lyapunovVS = gl.createShader(gl.VERTEX_SHADER);
@@ -561,6 +576,7 @@ function main()
         lyapunovPrevXTextureLocation      = gl.getUniformLocation(lyapunovShaderProgram, "gPrevX");
         lyapunovPrevLambdaTextureLocation = gl.getUniformLocation(lyapunovShaderProgram, "gPrevLambda");
         finalLambdaTextureLocation        = gl.getUniformLocation(finalShaderProgram,    "gLambdaTex");
+        staticImageTextureLocation        = gl.getUniformLocation(staticShaderProgram,   "gStaticImageTex");
     
         lyapunovSnUniformLocation    = gl.getUniformLocation(lyapunovShaderProgram, "gSn");
         lyapunovIndexUniformLocation = gl.getUniformLocation(lyapunovShaderProgram, "gIndex");
@@ -577,7 +593,7 @@ function main()
         colorMultiplyPosUniformLocation = gl.getUniformLocation(finalShaderProgram, "gColorMultiplyPos");
         colorAddPosUniformLocation      = gl.getUniformLocation(finalShaderProgram, "gColorAddPos");
 
-        //relativeTranslateUniformLocation = gl.getUniformLocation(staticShaderProgram, "gRelativeTranslate");
+        relativeTranslateUniformLocation = gl.getUniformLocation(staticShaderProgram, "gRelativeTranslate");
     }
 
     function createBuffers()
@@ -778,10 +794,12 @@ function main()
         currAnimationFrame = window.requestAnimationFrame(mainDraw);
     }
 
-    /*
-    function staticDraw()
+    function drawStaticTexture()
     {
-        gl.useProgram(staticShaderProgram);
+        gl.useProgram(finalShaderProgram);
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, staticImageFrameBuffer);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, staticTex, 0);
 
         gl.clearColor(1.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -791,9 +809,10 @@ function main()
 
         gl.uniform1i(finalLambdaTextureLocation, 0);
 
-        gl.uniform4fv(colorMultiplyUniformLocation, colorMultiply);
-        gl.uniform4fv(colorAddUniformLocation,      colorAdd);
-        gl.uniform4fv(colorAbsMixUniformLocation,   colorAbsMix);
+        gl.uniform4fv(colorMultiplyNegUniformLocation, colorMultiplyNeg);
+        gl.uniform4fv(colorAddNegUniformLocation,      colorAddNeg);
+        gl.uniform4fv(colorMultiplyPosUniformLocation, colorMultiplyPos);
+        gl.uniform4fv(colorAddPosUniformLocation,      colorAddPos);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, lambdaTex1);
@@ -803,9 +822,43 @@ function main()
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,     gl.REPEAT);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T,     gl.REPEAT);
 
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, null, 0);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    }
+
+    function staticDisplay()
+    {
+        gl.useProgram(staticShaderProgram);
+
+        gl.clearColor(1.0, 0.0, 0.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        gl.viewport(0, 0, standardWidth, standardHeight);
+        gl.bindVertexArray(finalVertexBuffer);
+
+        gl.uniform1i(staticImageTextureLocation, 0);
+
+        translationAmountX = (translationStart[0] - translationCurr[0])  / standardWidth;
+        translationAmountY = (translationCurr[1]  - translationStart[1]) / standardHeight;
+
+        console.log(translationAmountX + " " + translationAmountY);
+
+        gl.uniform2fv(relativeTranslateUniformLocation, [translationAmountX, translationAmountY]);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, staticTex);
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,     gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T,     gl.CLAMP_TO_EDGE);
+
         gl.drawBuffers([gl.BACK]);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    }*/
+    }
 
     //=================================================== Theme functions ===================================================\\
 
