@@ -15,8 +15,6 @@ function main()
     const buttonResetDefault  = document.querySelector("#ResetDefault");
     const buttonResetNegative = document.querySelector("#ResetNegative");
 
-    const imgToSave = document.getElementById("LyapunovImageToSave");
-
     const gl             = canvas.getContext("webgl2");
     const extFloatTex    = gl.getExtension("EXT_color_buffer_float");
     const extLinFloatTex = gl.getExtension("OES_texture_float_linear");
@@ -167,7 +165,7 @@ function main()
 
     const standardWidth  = canvas.clientWidth;
     const standardHeight = canvas.clientHeight;
-    const textureWidth   = standardWidth  * 2;
+    const textureWidth   = standardWidth * 2;
     const textureHeight  = standardHeight * 2;
 
     let resetShaderProgram    = null;
@@ -195,7 +193,7 @@ function main()
     let colorMultiplyPosUniformLocation = null;
     let colorAddPosUniformLocation      = null;
 
-    //let relativeTranslateUniformLocation = null;
+    let relativeTranslateUniformLocation = null;
 
     let xLambdaFrameBuffer     = null;
     let staticImageFrameBuffer = null;
@@ -841,8 +839,8 @@ function main()
 
         gl.uniform1i(staticImageTextureLocation, 0);
 
-        translationAmountX = (translationStart[0] - translationCurr[0])  / standardWidth;
-        translationAmountY = (translationCurr[1]  - translationStart[1]) / standardHeight;
+        let translationAmountX = (translationStart[0] - translationCurr[0])  / standardWidth;
+        let translationAmountY = (translationCurr[1]  - translationStart[1]) / standardHeight;
 
         console.log(translationAmountX + " " + translationAmountY);
 
