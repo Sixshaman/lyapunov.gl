@@ -15,6 +15,8 @@ function main()
     const buttonResetDefault  = document.querySelector("#ResetDefault");
     const buttonResetNegative = document.querySelector("#ResetNegative");
 
+    const buttonSave = document.querySelector("#ButtonSave");
+
     const gl             = canvas.getContext("webgl2");
     const extFloatTex    = gl.getExtension("EXT_color_buffer_float");
     const extLinFloatTex = gl.getExtension("OES_texture_float_linear");
@@ -151,6 +153,11 @@ function main()
         modeTranslation = false;
     }
 
+    buttonSave.onclick = function()
+    {
+        modeSaveCanvas = true;
+    }
+
     radioButtonFire.onclick    = defaultTheme;
     radioButtonElectro.onclick = electroTheme;
     radioButtonClassic.onclick = classicTheme;
@@ -159,6 +166,7 @@ function main()
     let seqStr   = seqTextArea.value;
     let seqIndex = 0;
 
+    let modeSaveCanvas     = false;
     let modeTranslation    = false;
     let currAnimationFrame = 0;
 
@@ -804,6 +812,12 @@ function main()
         gl.drawBuffers([gl.BACK]);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
+        if(modeSaveCanvas)
+        {
+            saveCanvas();
+            modeSaveCanvas = false;
+        }
+
         seqIndex           = seqIndex + 1;
         currAnimationFrame = window.requestAnimationFrame(mainDraw);
     }
@@ -972,6 +986,15 @@ function main()
 
             window.history.replaceState({}, '', window.location.pathname + "?" + queryString);
         }, delay);
+    }
+
+    function saveCanvas()
+    {
+        let link      = document.createElement("a");
+        link.href     = canvas.toDataURL("image/png");
+        link.download = "Lyapunov.png";
+
+        link.click();
     }
 
     //=================================================== Theme functions ===================================================\\

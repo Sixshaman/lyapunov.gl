@@ -35,6 +35,12 @@ div.domaincontainer
     flex-direction: row;
 }
 
+div.savecontainer
+{
+    display:        flex;
+    flex-direction: row;
+}
+
 div.resetButtons
 {
     display:        flex;
@@ -49,6 +55,12 @@ div.domaintext
 input[type=radio]
 {
     display:none;
+}
+
+button#ButtonSave
+{
+    display: block;
+    width: 100%;
 }
 
 textarea
