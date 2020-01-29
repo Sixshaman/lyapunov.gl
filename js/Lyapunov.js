@@ -35,6 +35,8 @@ function main()
         {
             seqStr = seqTextArea.value;
 
+            updateAddressBar(1000);
+
             resetValues();
             currAnimationFrame = window.requestAnimationFrame(mainDraw);
         }
@@ -61,6 +63,8 @@ function main()
         spaceScale[1] = spaceScale[1] * Math.pow(1.05, event.deltaY * 0.2);
 
         domainText.textContent = domainString(); 
+
+        updateAddressBar(1500);
 
         resetValues();
         currAnimationFrame = window.requestAnimationFrame(mainDraw);
@@ -106,6 +110,8 @@ function main()
     {
         if(modeTranslation && event.button == 0)
         {
+            updateAddressBar(1000);
+
             cancelAnimationFrame(currAnimationFrame);
             resetValues();
             currAnimationFrame = window.requestAnimationFrame(mainDraw);
@@ -122,6 +128,8 @@ function main()
 
         domainText.textContent = domainString();
 
+        updateAddressBar();
+
         resetValues();
         currAnimationFrame = window.requestAnimationFrame(mainDraw);
         modeTranslation = false;
@@ -135,6 +143,8 @@ function main()
         spaceTranslate = [-1.0, -1.0]; //[-1, 1] -> [-2, 0]; 
 
         domainText.textContent = domainString();
+
+        updateAddressBar();
 
         resetValues();
         currAnimationFrame = window.requestAnimationFrame(mainDraw);
@@ -152,11 +162,15 @@ function main()
     let modeTranslation    = false;
     let currAnimationFrame = 0;
 
+    let updateAddressBarTimeout = null;
+
     let translationStart = [0, 0];
     let translationCurr  = [0, 0];
 
     let spaceScale     = [2.0,  2.0]; //[-1, 1] -> [-2, 2]
     let spaceTranslate = [2.0,  2.0]; //[-2, 2] -> [ 0, 4]; 
+
+    let themeName = "Fire";
 
     let colorMultiplyNeg = [-1.0, -1.0, -1.0,  1.0];
     let colorAddNeg      = [ 0.0,  0.0,  0.0,  0.0];
@@ -209,7 +223,9 @@ function main()
     let lyapunovVertexBuffer = null;
     let finalVertexBuffer    = null;
 
-    defaultTheme();
+    let queryString = new URLSearchParams(window.location.search);
+
+    initFromAddressBar();
 
     createShaders();
     createTextures();
@@ -858,6 +874,106 @@ function main()
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
 
+    function initFromAddressBar()
+    {
+        const querySeqStr = queryString.get("seq");
+        if(querySeqStr !== null && querySeqStr !== "")
+        {
+            seqTextArea.value = querySeqStr.replace(/[^AaBb]/g, "");
+            seqTextArea.value = seqTextArea.value.toUpperCase();
+
+            if(seqTextArea.value === "")
+            {
+                seqTextArea.value = "AB";
+            }
+        }
+
+        seqStr = seqTextArea.value;
+    
+        const themeStr = queryString.get("theme");
+        if(themeStr !== null && themeStr !== "")
+        {
+            switch(themeStr)
+            {
+            case "Fire":
+                defaultTheme();
+                break;
+            case "Electro":
+                electroTheme();
+                break;
+            case "Classic":
+                classicTheme();
+                break;
+            case "Sepia":
+                sepiaTheme();
+                break;
+            default:
+                defaultTheme();
+                break;
+            }
+        }
+        else
+        {
+            defaultTheme();  
+        }
+
+        const scaleStr = queryString.get("scale");
+        if(scaleStr !== null && scaleStr !== "")
+        {
+            const scaleVal = parseFloat(scaleStr);
+            if(!isNaN(scaleVal) && Math.abs(scaleVal) > 0.000000000000000000001)
+            {
+                spaceScale[0] = scaleVal;
+                spaceScale[1] = scaleVal;
+            }
+        }
+
+        const translateXStr = queryString.get("translateX");
+        if(translateXStr !== null && translateXStr !== "")
+        {
+            const translateVal = parseFloat(translateXStr);
+            if(!isNaN(translateVal))
+            {
+                spaceTranslate[0] = translateVal;
+            }
+        }
+
+        const translateYStr = queryString.get("translateY");
+        if(translateYStr !== null && translateYStr !== "")
+        {
+            const translateVal = parseFloat(translateYStr);
+            if(!isNaN(translateVal))
+            {
+                spaceTranslate[1] = translateVal;
+            }
+        }
+        
+        domainText.textContent = domainString();
+        
+        queryString.set("seq",        seqStr);
+        queryString.set("theme",      themeName);
+        queryString.set("scale",      spaceScale[0].toString());
+        queryString.set("translateX", spaceTranslate[0].toString());
+        queryString.set("translateY", spaceTranslate[1].toString());
+        window.history.replaceState({}, '', window.location.pathname + "?" + queryString);
+    }
+
+    function updateAddressBar(delay)
+    {
+        console.log(updateAddressBarTimeout);
+        clearTimeout(updateAddressBarTimeout);
+        updateAddressBarTimeout = setTimeout(() => 
+        {
+            queryString.set("seq",        seqStr);
+            queryString.set("theme",      themeName);
+            queryString.set("scale",      spaceScale[0].toString());
+            queryString.set("translateX", spaceTranslate[0].toString());
+            queryString.set("translateY", spaceTranslate[1].toString());
+
+            window.history.replaceState({}, '', window.location.pathname + "?" + queryString);
+        }, delay);
+    }
+
     //=================================================== Theme functions ===================================================\\
 
     function defaultTheme()
@@ -866,6 +982,9 @@ function main()
         colorAddNeg      = [ 0.0, -1.0, -2.0,  0.0];
         colorMultiplyPos = [ 1.0,  1.0,  1.0,  1.0];
         colorAddPos      = [ 0.0, -1.0, -2.0,  0.0];
+
+        themeName = "Fire";
+        updateAddressBar(0);
     }
 
     function electroTheme()
@@ -874,6 +993,9 @@ function main()
         colorAddNeg      = [ 0.0,  0.0,  0.0,  0.0];
         colorMultiplyPos = [ 0.5,  0.1,  1.0,  1.0];
         colorAddPos      = [ 0.0,  0.0,  0.0,  0.0];
+
+        themeName = "Electro";
+        updateAddressBar(0);
     }
 
     function classicTheme()
@@ -882,6 +1004,9 @@ function main()
         colorAddNeg      = [ 1.00,  1.00,  0.00,  0.00];
         colorMultiplyPos = [ 0.00,  0.00,  2.00,  1.00];
         colorAddPos      = [ 0.00,  0.00,  0.00,  0.00];
+
+        themeName = "Classic";
+        updateAddressBar(0);
     }
 
     function sepiaTheme()
@@ -890,6 +1015,9 @@ function main()
         colorAddNeg      = [ 0.74,  0.58,  0.41, 0.0];
         colorMultiplyPos = [ 0.22,  0.18,  0.70, 1.0];
         colorAddPos      = [ 0.28,  0.26,  0.25, 0.0];
+
+        themeName = "Sepia";
+        updateAddressBar(0);
     }
 
     //=================================================== Util functions ===================================================\\

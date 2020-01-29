@@ -46,6 +46,11 @@ div.domaintext
     margin-top: -8pt;
 }
 
+input[type=radio]
+{
+    display:none;
+}
+
 textarea
 {
     background-color: black;
