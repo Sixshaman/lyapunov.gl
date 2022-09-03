@@ -18,24 +18,24 @@ jobs:
       uses: canastro/copy-file-action@master
       with:
         source: "lyapunov.html"
-        target: "lyapunov/lyapunov.html"
+        target: "LyapunovFractal/lyapunov.html"
     - name: Copy CSS
       uses: canastro/copy-file-action@master
       with:
         source: "css"
-        target: "lyapunov/css"
+        target: "LyapunovFractal/css"
         flags: "-r"
     - name: Copy JS
       uses: canastro/copy-file-action@master
       with:
         source: "js"
-        target: "lyapunov/js"
+        target: "LyapunovFractal/js"
         flags: "-r"
     - name: Copy image assets
       uses: canastro/copy-file-action@master
       with:
         source: "images"
-        target: "lyapunov/images"
+        target: "LyapunovFractal/images"
         flags: "-r"
     - name: Zip release
       uses: montudor/action-zip@v1
