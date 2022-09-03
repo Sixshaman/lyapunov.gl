@@ -2,20 +2,20 @@ window.onload = main;
 
 function main()
 {
-    const canvas      = document.querySelector("#LyapunovCanvas");
-    const seqTextArea = document.querySelector("#LyapunovSequence");
+    const canvas      = document.getElementById("LyapunovCanvas");
+    const seqTextArea = document.getElementById("LyapunovSequence");
     
-    const radioButtonFire    = document.querySelector("#RadioThemeFire");
-    const radioButtonElectro = document.querySelector("#RadioThemeElectro");
-    const radioButtonClassic = document.querySelector("#RadioThemeClassic");
-    const radioButtonSepia   = document.querySelector("#RadioThemeSepia");
+    const radioButtonFire    = document.getElementById("RadioThemeFire");
+    const radioButtonElectro = document.getElementById("RadioThemeElectro");
+    const radioButtonClassic = document.getElementById("RadioThemeClassic");
+    const radioButtonSepia   = document.getElementById("RadioThemeSepia");
 
-    const domainText = document.querySelector("#domain");
+    const domainText = document.getElementById("DomainLabel");
 
-    const buttonResetDefault  = document.querySelector("#ResetDefault");
-    const buttonResetNegative = document.querySelector("#ResetNegative");
+    const buttonResetDefault  = document.getElementById("ResetDefaultButton");
+    const buttonResetNegative = document.getElementById("ResetNegativeButton");
 
-    const buttonSave = document.querySelector("#ButtonSave");
+    const buttonSave = document.getElementById("SaveButton");
 
     const gl             = canvas.getContext("webgl2");
     const extFloatTex    = gl.getExtension("EXT_color_buffer_float");
@@ -58,8 +58,6 @@ function main()
         event.preventDefault();
 
         window.cancelAnimationFrame(currAnimationFrame);
-
-        console.log(event.deltaY);
 
         spaceScale[0] = spaceScale[0] * Math.pow(1.05, event.deltaY * 0.2);
         spaceScale[1] = spaceScale[1] * Math.pow(1.05, event.deltaY * 0.2);
@@ -408,10 +406,8 @@ function main()
 
         layout(location=0) in mediump vec4 vScreenPos;
         layout(location=1) in mediump vec2 vScreenAB;
-        layout(location=2) in mediump vec2 vScreenTex;
         
         out mediump vec2 vSpacePosition;
-        out mediump vec2 vTexCoord;
         
         uniform highp vec2 gScale;
         uniform highp vec2 gTranslate;
@@ -420,7 +416,6 @@ function main()
         {
             gl_Position    = vScreenPos;
             vSpacePosition = vScreenAB * gScale + gTranslate;
-            vTexCoord      = vScreenTex;
         }`;
         
         const fsResetSource =
@@ -429,7 +424,6 @@ function main()
         uniform uint gSn;
         
         in mediump vec2 vSpacePosition;
-        in mediump vec2 vTexCoord; 
         
         layout(location=0) out highp float oNextX;
         layout(location=1) out highp float oLambda;
@@ -694,13 +688,6 @@ function main()
         gl.bufferData(gl.ARRAY_BUFFER, abArray, gl.STATIC_DRAW);
         gl.vertexAttribPointer(attrib, 2, gl.FLOAT, false, 0, 0);
 
-        attrib = gl.getAttribLocation(resetShaderProgram, "vScreenTex");
-        gl.enableVertexAttribArray(attrib);
-        let texResetBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, texResetBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, texArray, gl.STATIC_DRAW);
-        gl.vertexAttribPointer(attrib, 2, gl.FLOAT, false, 0, 0);
-
         gl.bindVertexArray(null);
     }
 
@@ -872,8 +859,6 @@ function main()
         let translationAmountX = (translationStart[0] - translationCurr[0])  / standardWidth;
         let translationAmountY = (translationCurr[1]  - translationStart[1]) / standardHeight;
 
-        console.log(translationAmountX + " " + translationAmountY);
-
         gl.uniform2fv(relativeTranslateUniformLocation, [translationAmountX, translationAmountY]);
 
         gl.activeTexture(gl.TEXTURE0);
@@ -974,7 +959,6 @@ function main()
 
     function updateAddressBar(delay)
     {
-        console.log(updateAddressBarTimeout);
         clearTimeout(updateAddressBarTimeout);
         updateAddressBarTimeout = setTimeout(() => 
         {
