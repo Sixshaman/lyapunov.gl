@@ -1,0 +1,58 @@
+name: Publish release
+
+on:
+  push:
+    branches: [ "master" ]
+    
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create deploy folder
+      run: mkdir -p ${GITHUB_WORKSPACE}/LyapunovFractal
+    - name: Copy HTML
+      uses: canastro/copy-file-action@master
+      with:
+        source: "lyapunov.html"
+        target: "lyapunov/lyapunov.html"
+    - name: Copy CSS
+      uses: canastro/copy-file-action@master
+      with:
+        source: "css"
+        target: "lyapunov/css"
+        flags: "-r"
+    - name: Copy JS
+      uses: canastro/copy-file-action@master
+      with:
+        source: "js"
+        target: "lyapunov/js"
+        flags: "-r"
+    - name: Copy image assets
+      uses: canastro/copy-file-action@master
+      with:
+        source: "images"
+        target: "lyapunov/images"
+        flags: "-r"
+    - name: Zip release
+      uses: montudor/action-zip@v1
+      with:
+        args: zip -qq -r LyapunovFractal.zip LyapunovFractal
+    - name: Get release name
+      id: release_name
+      run: echo "::set-output name=relname::$(date +'Build %Y-%m-%d %H:%M:%S')"
+    - name: Get tag name
+      id: tag_name
+      run: echo "::set-output name=tagname::$(date +'%Y-%m-%d-%H-%M-%S')"
+    - name: Create release
+      id: create_release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "LyapunovFractal.zip"
+        token: ${{secrets.GITHUB_TOKEN}}
+        name: ${{steps.release_name.outputs.relname}}
+        tag: ${{steps.tag_name.outputs.tagname}}
+        commit: ${{github.sha}}
